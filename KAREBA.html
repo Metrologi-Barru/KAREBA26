@@ -1,0 +1,864 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>KAREBA : Kalkulator Tera Metrologi Barru</title>
+  <style>
+    :root{
+      --bg:#f6f8fb;--card:#ffffff;--text:#102033;--muted:#5d697c;--line:#d9e2ee;--primary:#155eef;--primary-dark:#0f49bd;--danger:#b42318;--ok:#067647;--warn:#b54708;--soft:#eef4ff;--shadow:0 10px 30px rgba(16,32,51,.08);--radius:18px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:linear-gradient(180deg,#eaf1ff 0,#f6f8fb 280px);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:var(--text);line-height:1.45}
+    header{max-width:1200px;margin:0 auto;padding:34px 18px 18px}
+    .hero{display:grid;grid-template-columns:1.45fr .85fr;gap:18px;align-items:stretch}
+    .hero-card,.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+    .hero-card{padding:28px}
+    h1{font-size:clamp(1.8rem,3vw,3rem);line-height:1.08;margin:0 0 12px;letter-spacing:-.025em}
+    h2{font-size:1.25rem;margin:0 0 16px;letter-spacing:-.01em}
+    h3{font-size:1.05rem;margin:18px 0 10px}
+    .subtitle{font-size:1rem;color:var(--muted);max-width:840px;margin:0}
+    .badge-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+    .badge{font-size:.82rem;color:#1d3b74;background:#eaf1ff;border:1px solid #c9d9ff;padding:6px 10px;border-radius:999px}
+    .quick-card{padding:22px;display:flex;flex-direction:column;gap:11px}
+    .quick-card strong{font-size:1rem}
+    main{max-width:1200px;margin:0 auto;padding:0 18px 42px}
+    .grid{display:grid;grid-template-columns:440px 1fr;gap:18px;align-items:start}
+    .card{padding:22px;margin-bottom:18px}
+    label{display:block;font-size:.9rem;font-weight:680;margin:13px 0 7px}
+    input,select,textarea{width:100%;font:inherit;padding:11px 12px;border:1px solid #cbd5e1;border-radius:12px;background:#fff;color:var(--text);outline:none}
+    input:focus,select:focus,textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(21,94,239,.12)}
+    .row{display:grid;grid-template-columns:1fr 120px;gap:10px}
+    .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+    .small{font-size:.84rem;color:var(--muted)}
+    .help{font-size:.82rem;color:var(--muted);margin-top:6px}
+    .btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+    button{border:none;border-radius:12px;padding:11px 14px;font-weight:750;cursor:pointer;font:inherit}
+    .primary{background:var(--primary);color:#fff}.primary:hover{background:var(--primary-dark)}
+    .secondary{background:#eef2f7;color:#263445}.secondary:hover{background:#e2e8f0}
+    .ghost{background:#fff;border:1px solid var(--line);color:#263445}.ghost:hover{background:#f8fafc}
+    .result-top{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}
+    .metric{background:#f8fafc;border:1px solid var(--line);border-radius:15px;padding:14px}
+    .metric .k{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.045em}.metric .v{font-size:1.13rem;font-weight:850;margin-top:4px}.metric .s{font-size:.78rem;color:var(--muted);margin-top:3px}
+    .status{padding:9px 11px;border-radius:12px;font-weight:780;display:inline-block}.status.ok{color:var(--ok);background:#ecfdf3;border:1px solid #abefc6}.status.bad{color:var(--danger);background:#fef3f2;border:1px solid #fecdca}.status.warn{color:var(--warn);background:#fffaeb;border:1px solid #fedf89}
+    table{width:100%;border-collapse:collapse;margin-top:10px;background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+    th,td{padding:10px 11px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;font-size:.9rem}th{background:#f8fafc;color:#334155;font-weight:850}tr:last-child td{border-bottom:none}
+    .table-wrap{overflow:auto;border-radius:14px}.formula{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;background:#f8fafc;border:1px solid var(--line);padding:10px 12px;border-radius:12px;color:#24324a}
+    .note{background:#fff8e6;border:1px solid #f8d774;color:#4e3a00;padding:12px 14px;border-radius:14px;margin:12px 0}.note strong{display:block;margin-bottom:4px}
+    .okbox{background:#ecfdf3;border:1px solid #abefc6;color:#064e3b;padding:12px 14px;border-radius:14px;margin:12px 0}
+    .muted{color:var(--muted)}
+    .tabs{display:flex;gap:8px;background:#eaf1ff;border:1px solid #c9d9ff;padding:6px;border-radius:15px;margin-bottom:18px}.tab{flex:1;background:transparent;color:#24416f}.tab.active{background:#fff;box-shadow:0 2px 8px rgba(16,32,51,.08)}
+    .hidden{display:none!important}.load-row{display:grid;grid-template-columns:1fr 1fr 42px;gap:8px;margin-bottom:8px}.load-row button{padding:9px 0}.footer{color:var(--muted);font-size:.82rem;margin-top:28px}.print-only{display:none}
+    .mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.nowrap{white-space:nowrap}.plan-note{background:#f8fafc;border:1px dashed #cbd5e1;color:#334155;padding:10px 12px;border-radius:12px;margin:10px 0}.subtle-title{font-weight:850;color:#1e293b;margin-top:16px}
+    @media(max-width:950px){.hero,.grid{grid-template-columns:1fr}.result-top{grid-template-columns:1fr 1fr}.row3,.row,.mini-grid{grid-template-columns:1fr}.load-row{grid-template-columns:1fr 1fr 42px}}
+    @media(max-width:560px){.result-top{grid-template-columns:1fr}.load-row{grid-template-columns:1fr}.load-row button{width:100%}}
+    @media print{body{background:#fff}header,.input-panel,.btns .secondary,.btns .ghost,.tabs,.footer{display:none!important}.grid{display:block}.card{box-shadow:none;border:1px solid #999}.print-only{display:block}.result-top{grid-template-columns:repeat(4,1fr)}button{display:none}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="hero">
+      <section class="hero-card">
+        <h1>KAREBA : Kalkulator Tera Metrologi Barru</h1>
+        <p class="subtitle">Berdasarkan Kepdirjen PKTN No. 240 Tahun 2023 tentang Syarat Teknis Timbangan Bukan Otomatis</p>
+        <div class="badge-row">
+          <span class="badge">Kepdirjen PKTN No. 240/2023</span>
+          <span class="badge">Timbangan bukan otomatis</span>
+          <span class="badge">Kelas I, II, III, IIII</span>
+          <span class="badge">BKD tera & tera ulang</span>
+          <span class="badge">Mode khusus dacin/neraca</span>
+          <span class="badge">Rencana muatan uji per jenis timbangan</span>
+        </div>
+      </section>
+      <aside class="quick-card hero-card">
+        <strong>Alur pakai cepat</strong>
+        <span class="small">1. Pilih mode umum atau khusus.</span>
+        <span class="small">2. Isi Max, e/d, jenis kegiatan, dan konfigurasi alat.</span>
+        <span class="small">3. Klik “Hitung”. Hasil BKD serta rencana jenis dan muatan uji per jenis timbangan dapat dicetak atau diekspor CSV.</span>
+      </aside>
+    </div>
+  </header>
+
+  <main>
+    <div class="grid">
+      <section class="input-panel card">
+        <div class="tabs" role="tablist" aria-label="Mode perhitungan">
+          <button class="tab active" id="tab-general" type="button" onclick="setMode('general')">Umum</button>
+          <button class="tab" id="tab-special" type="button" onclick="setMode('special')">Khusus</button>
+        </div>
+
+        <div id="general-form">
+          <h2>Data timbangan umum</h2>
+          <label for="maxVal">Kapasitas maksimum, Max</label>
+          <div class="row"><input id="maxVal" type="number" min="0" step="any" placeholder="contoh: 30"><select id="maxUnit"><option value="kg">kg</option><option value="g">g</option><option value="mg">mg</option><option value="t">ton</option></select></div>
+
+          <label for="eVal">Interval skala verifikasi, e</label>
+          <div class="row"><input id="eVal" type="number" min="0" step="any" placeholder="contoh: 10"><select id="eUnit"><option value="g">g</option><option value="kg">kg</option><option value="mg">mg</option><option value="t">ton</option></select></div>
+
+          <label for="dVal">Interval skala nyata/daya baca, d <span class="muted">(opsional)</span></label>
+          <div class="row"><input id="dVal" type="number" min="0" step="any" placeholder="kosongkan bila d = e"><select id="dUnit"><option value="g">g</option><option value="kg">kg</option><option value="mg">mg</option><option value="t">ton</option></select></div>
+          <p class="help">Untuk alat tanpa penunjuk tambahan umumnya e = d. Jika e berbeda dari d, gunakan e yang tercantum pada identitas alat; Min akan dihitung menurut d bila d diisi.</p>
+
+          <label for="markedClass">Kelas tertera pada alat</label>
+          <select id="markedClass">
+            <option value="auto">Tentukan otomatis dari Max/e</option>
+            <option value="I">Kelas I</option>
+            <option value="II">Kelas II</option>
+            <option value="III">Kelas III</option>
+            <option value="IIII">Kelas IIII</option>
+          </select>
+
+          <label for="inspectionType">Jenis kegiatan/BKD</label>
+          <select id="inspectionType">
+            <option value="initial">Tera / verifikasi awal — 1 × BKD tabel</option>
+            <option value="service">Tera ulang / pengawasan / pemakaian — 2 × BKD tabel</option>
+          </select>
+
+          <h3>Parameter jenis pengujian</h3>
+          <label for="instrumentFamily">Jenis timbangan untuk rencana muatan uji</label>
+          <select id="instrumentFamily" onchange="updateMultiIntervalPanel()">
+            <option value="electronic">Timbangan elektronik</option>
+            <option value="electronic_multi_interval">Timbangan elektronik multi interval</option>
+            <option value="electronic_multi_range">Timbangan elektronik multi rentang</option>
+            <option value="dacin">Dacin</option>
+            <option value="meja">Timbangan meja</option>
+            <option value="sentisimal">Timbangan sentisimal</option>
+            <option value="bobot_ingsut">Timbangan bobot ingsut</option>
+            <option value="pegas_cepat">Timbangan pegas / timbangan cepat</option>
+            <option value="cepat_meja">Timbangan cepat meja</option>
+            <option value="neraca">Neraca</option>
+          </select>
+
+          <div class="mini-grid">
+            <div>
+              <label for="hasTare">Fungsi tara</label>
+              <select id="hasTare">
+                <option value="no">Tidak / tidak diuji</option>
+                <option value="yes">Ada / perlu uji tara</option>
+              </select>
+            </div>
+            <div>
+              <label for="auxVal">Kapasitas gandar/skala acuan <span class="muted">(opsional)</span></label>
+              <div class="row"><input id="auxVal" type="number" min="0" step="any" placeholder="gandar utama/besar"><select id="auxUnit"><option value="kg">kg</option><option value="g">g</option><option value="mg">mg</option><option value="t">ton</option></select></div>
+            </div>
+          </div>
+
+          <label for="smallBeamVal">Kapasitas gandar kecil <span class="muted">(opsional, untuk bobot ingsut)</span></label>
+          <div class="row"><input id="smallBeamVal" type="number" min="0" step="any" placeholder="isi bila uji kebenaran gandar kecil diperlukan"><select id="smallBeamUnit"><option value="kg">kg</option><option value="g">g</option><option value="mg">mg</option><option value="t">ton</option></select></div>
+          <div id="multiIntervalPanel" class="note hidden">
+            <strong>Parameter timbangan elektronik multi interval</strong>
+            <div class="mini-grid">
+              <div>
+                <label for="miMax1Val">Kapasitas maksimum 1, Max₁</label>
+                <div class="row"><input id="miMax1Val" type="number" min="0" step="any" placeholder="contoh: 15"><select id="miMax1Unit"><option value="kg">kg</option><option value="g">g</option><option value="mg">mg</option><option value="t">ton</option></select></div>
+              </div>
+              <div>
+                <label for="miE1Val">Interval skala verifikasi 1, e₁</label>
+                <div class="row"><input id="miE1Val" type="number" min="0" step="any" placeholder="contoh: 5"><select id="miE1Unit"><option value="g">g</option><option value="kg">kg</option><option value="mg">mg</option><option value="t">ton</option></select></div>
+              </div>
+              <div>
+                <label for="miMax2Val">Kapasitas maksimum 2, Max₂</label>
+                <div class="row"><input id="miMax2Val" type="number" min="0" step="any" placeholder="contoh: 30"><select id="miMax2Unit"><option value="kg">kg</option><option value="g">g</option><option value="mg">mg</option><option value="t">ton</option></select></div>
+              </div>
+              <div>
+                <label for="miE2Val">Interval skala verifikasi 2, e₂</label>
+                <div class="row"><input id="miE2Val" type="number" min="0" step="any" placeholder="contoh: 10"><select id="miE2Unit"><option value="g">g</option><option value="kg">kg</option><option value="mg">mg</option><option value="t">ton</option></select></div>
+              </div>
+            </div>
+            <p class="help">Rentang ukur akan dibuat sebagai interval I: 0 sampai Max₁, dan interval II: di atas Max₁ sampai Max₂. BKD muatan pada rencana uji memakai e sesuai interval muatan bila seluruh parameter ini diisi.</p>
+          </div>
+
+          <p class="help">Bagian ini menyusun daftar jenis pengujian dan muatan uji sesuai jenis timbangan, termasuk perlakuan imbuh BKD untuk uji kepekaan/diskriminasi. Untuk timbangan elektronik multi interval atau multi rentang, isi Max dan e sesuai interval/rentang yang sedang dihitung, lalu ulangi untuk interval/rentang berikutnya bila diperlukan.</p>
+
+        </div>
+
+        <div id="special-form" class="hidden">
+          <h2>Data timbangan khusus</h2>
+          <label for="specialType">Jenis timbangan</label>
+          <select id="specialType" onchange="renderSpecialHint()">
+            <option value="dacin">Dacin</option>
+            <option value="meja">Timbangan meja</option>
+            <option value="obat">Neraca obat (kelas III)</option>
+            <option value="emas">Neraca emas (kelas III)</option>
+          </select>
+          <div id="specialHint" class="formula"></div>
+
+          <label for="sInspectionType">Jenis kegiatan/BKD</label>
+          <select id="sInspectionType">
+            <option value="initial">Tera — 1 × BKD tabel/formula</option>
+            <option value="service">Tera ulang / pengawasan — 2 × BKD tabel/formula</option>
+          </select>
+
+          <label for="sMaxVal">Kapasitas maksimum, Max</label>
+          <div class="row"><input id="sMaxVal" type="number" min="0" step="any" placeholder="contoh: 100"><select id="sMaxUnit"><option value="kg">kg</option><option value="g">g</option><option value="mg">mg</option><option value="t">ton</option></select></div>
+          <label for="sLoadVal">Muatan uji, m</label>
+          <div class="row"><input id="sLoadVal" type="number" min="0" step="any" placeholder="contoh: 25"><select id="sLoadUnit"><option value="kg">kg</option><option value="g">g</option><option value="mg">mg</option><option value="t">ton</option></select></div>
+          <label for="sIndVal">Penunjukan alat / hasil baca, I <span class="muted">(opsional)</span></label>
+          <div class="row"><input id="sIndVal" type="number" step="any" placeholder="kosongkan jika hanya hitung BKD"><select id="sIndUnit"><option value="kg">kg</option><option value="g">g</option><option value="mg">mg</option><option value="t">ton</option></select></div>
+        </div>
+
+        <div class="btns">
+          <button class="primary" type="button" onclick="calculate()">Hitung</button>
+          <button class="secondary" type="button" onclick="resetForm()">Reset</button>
+          <button class="ghost" type="button" onclick="window.print()">Cetak</button>
+          <button class="ghost" type="button" onclick="exportCSV()">Ekspor CSV</button>
+        </div>
+      </section>
+
+      <section>
+        <div class="card">
+          <div class="print-only"><h1>KAREBA : Kalkulator Tera Metrologi Barru</h1><p>Berdasarkan Kepdirjen PKTN No. 240 Tahun 2023 tentang Syarat Teknis Timbangan Bukan Otomatis</p></div>
+          <h2>Hasil perhitungan</h2>
+          <div id="result" class="muted">Masukkan data, lalu klik <strong>Hitung</strong>.</div>
+        </div>
+
+        <div class="card">
+          <h2>Rumus dan tabel acuan</h2>
+          <p class="small">Mode umum menggunakan n = Max/e, penetapan kelas berdasarkan e dan n, Min berdasarkan faktor kelas, BKD bertingkat ±0,5e; ±1e; ±1,5e, serta rencana muatan uji sesuai jenis timbangan. Untuk tera ulang/pengawasan/pemakaian, aplikasi menggunakan 2 × BKD tabel.</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Kelas</th><th>Syarat e dan n</th><th>Min</th></tr></thead>
+              <tbody>
+                <tr><td>I</td><td>e ≥ 0,001 g; n ≥ 50.000</td><td>100e</td></tr>
+                <tr><td>II</td><td>0,001 g ≤ e ≤ 0,05 g; 100 ≤ n ≤ 100.000<br>atau e ≥ 0,1 g; 5.000 ≤ n ≤ 100.000</td><td>20e atau 50e</td></tr>
+                <tr><td>III</td><td>0,1 g ≤ e ≤ 2 g; 100 ≤ n ≤ 10.000<br>atau e ≥ 5 g; 500 ≤ n ≤ 10.000</td><td>20e</td></tr>
+                <tr><td>IIII</td><td>e ≥ 5 g; 100 ≤ n ≤ 1.000</td><td>10e</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>BKD tabel</th><th>Kelas I</th><th>Kelas II</th><th>Kelas III</th><th>Kelas IIII</th></tr></thead>
+              <tbody>
+                <tr><td>±0,5e</td><td>0 ≤ m ≤ 50.000e</td><td>0 ≤ m ≤ 5.000e</td><td>0 ≤ m ≤ 500e</td><td>0 ≤ m ≤ 50e</td></tr>
+                <tr><td>±1e</td><td>50.000e &lt; m ≤ 200.000e</td><td>5.000e &lt; m ≤ 20.000e</td><td>500e &lt; m ≤ 2.000e</td><td>50e &lt; m ≤ 200e</td></tr>
+                <tr><td>±1,5e</td><td>200.000e &lt; m</td><td>20.000e &lt; m ≤ 100.000e</td><td>2.000e &lt; m ≤ 10.000e</td><td>200e &lt; m ≤ 1.000e</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="note"><strong>Catatan penting</strong>Aplikasi ini hanya membantu perhitungan BKD dan klasifikasi. Keputusan tera tetap harus mengikuti identitas alat, persetujuan tipe, cerapan/prosedur pengujian, standar uji, kondisi lingkungan, dan ketentuan unit metrologi legal.</div>
+        </div>
+
+        <div class="footer">
+          Dasar pengembangan: Kepdirjen PKTN No. 240 Tahun 2023 tentang Syarat Teknis Timbangan Bukan Otomatis; tabel kelas dan BKD umum sejalan dengan OIML R 76-1:2006.
+        </div>
+      </section>
+    </div>
+  </main>
+
+<script>
+'use strict';
+const unitToG = {mg:0.001,g:1,kg:1000,t:1000000};
+const unitNames = {mg:'mg',g:'g',kg:'kg',t:'ton'};
+const classData = {
+  I: {name:'Kelas I (khusus)', order:1, mpe:[[50000,0.5],[200000,1],[Infinity,1.5]], ranges:'e ≥ 0,001 g; n ≥ 50.000'},
+  II: {name:'Kelas II (halus)', order:2, mpe:[[5000,0.5],[20000,1],[100000,1.5]], ranges:'0,001 g ≤ e ≤ 0,05 g: 100 ≤ n ≤ 100.000; atau e ≥ 0,1 g: 5.000 ≤ n ≤ 100.000'},
+  III: {name:'Kelas III (sedang)', order:3, mpe:[[500,0.5],[2000,1],[10000,1.5]], ranges:'0,1 g ≤ e ≤ 2 g: 100 ≤ n ≤ 10.000; atau e ≥ 5 g: 500 ≤ n ≤ 10.000'},
+  IIII: {name:'Kelas IIII (biasa)', order:4, mpe:[[50,0.5],[200,1],[1000,1.5]], ranges:'e ≥ 5 g; 100 ≤ n ≤ 1.000'}
+};
+const specialRules = {
+  dacin:{label:'Dacin', eFormula:'e = Max / 1000', bkdFormula:'BKD = (Max + 2m) / 3000', calcE:(Max)=>Max/1000, calcBKD:(Max,m)=>(Max+2*m)/3000, cls:'Khusus'},
+  meja:{label:'Timbangan meja', eFormula:'e = Max / 1000', bkdFormula:'BKD = (Max + 2m) / 3000', calcE:(Max)=>Max/1000, calcBKD:(Max,m)=>(Max+2*m)/3000, cls:'Khusus'},
+  obat:{label:'Neraca obat (kelas III)', eFormula:'Kelas III; BKD dihitung dari muatan uji', bkdFormula:'BKD = m / 5000', calcE:(Max)=>NaN, calcBKD:(Max,m)=>m/5000, cls:'III'},
+  emas:{label:'Neraca emas (kelas III)', eFormula:'Kelas III; BKD dihitung dari muatan uji', bkdFormula:'BKD = m / 4000', calcE:(Max)=>NaN, calcBKD:(Max,m)=>m/4000, cls:'III'}
+};
+let mode='general';
+let lastRows=[];
+let lastPlanRows=[];
+
+function fmt(num, unit='g'){
+  if(!Number.isFinite(num)) return '-';
+  const v = num / unitToG[unit];
+  const abs = Math.abs(v);
+  let digits = abs >= 100000 ? 7 : abs >= 100 ? 6 : abs >= 1 ? 7 : 8;
+  let s = Number(v.toPrecision(digits)).toLocaleString('id-ID', {maximumFractionDigits:8});
+  return `${s} ${unitNames[unit]}`;
+}
+
+function fmtRepeatabilityLoad(num, unit){
+  if(!Number.isFinite(num)) return '-';
+  const u = unit || pickBestUnit(num);
+  const raw = num / unitToG[u];
+  const rounded = Math.ceil(raw - 1e-10);
+  return `${rounded.toLocaleString('id-ID', {maximumFractionDigits:0})} ${unitNames[u]}`;
+}
+function fmtTruthAndRepeatabilityLoad(num, unit){
+  const truthText = fmt(num, unit || pickBestUnit(num));
+  const repText = fmtRepeatabilityLoad(num, unit || pickBestUnit(num));
+  return truthText === repText ? truthText : `Kebenaran: ${truthText}; repeatability: ${repText}`;
+}
+function fmtTruthLoadsWithRoundedBkd2(minLoad, bkd2Load, maxLoad, unit){
+  const u = unit || pickBestUnit(maxLoad);
+  const items = [];
+  const push = (text) => { if(text && !items.includes(text)) items.push(text); };
+  if(Number.isFinite(minLoad) && minLoad>=0) push(fmt(minLoad, u));
+  if(Number.isFinite(bkd2Load) && bkd2Load>=0) push(fmtRepeatabilityLoad(bkd2Load, u));
+  if(Number.isFinite(maxLoad) && maxLoad>=0) push(fmt(maxLoad, u));
+  return items.join('; ');
+}
+function repeatabilityMassText(num, unit, fallback){
+  return Number.isFinite(num) && num>0 ? fmtRepeatabilityLoad(num, unit || pickBestUnit(num)) : fallback;
+}
+
+function fmtNum(num){
+  if(!Number.isFinite(num)) return '-';
+  return Number(num.toPrecision(9)).toLocaleString('id-ID', {maximumFractionDigits:9});
+}
+function parseMass(idVal,idUnit,allowZero=false){
+  const val = Number(document.getElementById(idVal).value);
+  const unit = document.getElementById(idUnit).value;
+  if(!Number.isFinite(val) || val < 0 || (!allowZero && val===0)) return null;
+  return val * unitToG[unit];
+}
+function parseOptionalMass(idVal,idUnit){
+  const raw = document.getElementById(idVal)?.value?.trim() ?? '';
+  if(raw === '') return 0;
+  const val = Number(raw);
+  const unit = document.getElementById(idUnit).value;
+  if(!Number.isFinite(val) || val < 0) return null;
+  return val * unitToG[unit];
+}
+function escapeHtml(x){return String(x).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function pickBestUnit(g){
+  const a=Math.abs(g);
+  if(a>=1000000) return 't';
+  if(a>=1000) return 'kg';
+  if(a>0 && a<1) return 'mg';
+  return 'g';
+}
+function massToUnitValue(g, unit){return Number((g/unitToG[unit]).toPrecision(8));}
+function setMode(next){
+  mode=next;
+  document.getElementById('tab-general').classList.toggle('active', next==='general');
+  document.getElementById('tab-special').classList.toggle('active', next==='special');
+  document.getElementById('general-form').classList.toggle('hidden', next!=='general');
+  document.getElementById('special-form').classList.toggle('hidden', next!=='special');
+  document.getElementById('result').innerHTML='Masukkan data, lalu klik <strong>Hitung</strong>.';
+  renderSpecialHint();
+}
+function renderSpecialHint(){
+  const t = document.getElementById('specialType').value;
+  const r = specialRules[t];
+  document.getElementById('specialHint').innerHTML = `${escapeHtml(r.eFormula)}<br>${escapeHtml(r.bkdFormula)}`;
+}
+function addLoadRow(load='', indication=''){
+  const box = document.getElementById('loadRows');
+  if(!box) return;
+  const div = document.createElement('div');
+  div.className='load-row';
+  div.innerHTML = `<div><input class="loadVal" type="number" min="0" step="any" placeholder="Muatan uji, m" value="${escapeHtml(load)}"></div><div><input class="indVal" type="number" step="any" placeholder="Penunjukan, I (opsional)" value="${escapeHtml(indication)}"></div><button class="secondary" type="button" title="Hapus" onclick="this.closest('.load-row').remove()">×</button>`;
+  box.appendChild(div);
+}
+function clearLoadRows(){const box=document.getElementById('loadRows'); if(box) box.innerHTML='';}
+function getGeneralLoads(unit){
+  const rows = [...document.querySelectorAll('#loadRows .load-row')];
+  return rows.map((r,idx)=>{
+    const m = Number(r.querySelector('.loadVal').value);
+    const indRaw = r.querySelector('.indVal').value.trim();
+    const ind = indRaw === '' ? null : Number(indRaw);
+    return {idx:idx+1, m:Number.isFinite(m)&&m>=0 ? m*unitToG[unit] : null, indication:(indRaw!==''&&Number.isFinite(ind)) ? ind*unitToG[unit] : null};
+  }).filter(r=>r.m!==null);
+}
+function minFactorForClass(cls,e){
+  if(cls==='I') return 100;
+  if(cls==='II') return e <= 0.05 ? 20 : 50;
+  if(cls==='III') return 20;
+  if(cls==='IIII') return 10;
+  return null;
+}
+function validClasses(e,n){
+  const out=[];
+  if(e >= 0.001 && n >= 50000) out.push({cls:'I', minCapE:100, reason:'e ≥ 0,001 g dan n ≥ 50.000'});
+  if(e >= 0.001 && e <= 0.05 && n >= 100 && n <= 100000) out.push({cls:'II', minCapE:20, reason:'0,001 g ≤ e ≤ 0,05 g dan 100 ≤ n ≤ 100.000'});
+  if(e >= 0.1 && n >= 5000 && n <= 100000) out.push({cls:'II', minCapE:50, reason:'e ≥ 0,1 g dan 5.000 ≤ n ≤ 100.000'});
+  if(e >= 0.1 && e <= 2 && n >= 100 && n <= 10000) out.push({cls:'III', minCapE:20, reason:'0,1 g ≤ e ≤ 2 g dan 100 ≤ n ≤ 10.000'});
+  if(e >= 5 && n >= 500 && n <= 10000) out.push({cls:'III', minCapE:20, reason:'e ≥ 5 g dan 500 ≤ n ≤ 10.000'});
+  if(e >= 5 && n >= 100 && n <= 1000) out.push({cls:'IIII', minCapE:10, reason:'e ≥ 5 g dan 100 ≤ n ≤ 1.000'});
+  out.sort((a,b)=>classData[b.cls].order-classData[a.cls].order);
+  return out;
+}
+function selectedClass(e,n){
+  const marked=document.getElementById('markedClass').value;
+  const valids=validClasses(e,n);
+  if(marked !== 'auto'){
+    const match = valids.find(x=>x.cls===marked);
+    return {chosen: marked, minCapE: match ? match.minCapE : minFactorForClass(marked,e), valids, validMarked: !!match};
+  }
+  return {chosen: valids[0]?.cls || null, minCapE: valids[0]?.minCapE ?? null, valids, validMarked:true};
+}
+function mpeFactor(cls, intervals){
+  const data=classData[cls];
+  for(const [upper,factor] of data.mpe){
+    if(intervals <= upper) return factor;
+  }
+  return null;
+}
+function rangeTable(cls,e,mult=1){
+  const rows=classData[cls].mpe;
+  let lower=0;
+  return rows.map(([upper,factor],i)=>{
+    const from = i===0 ? '0' : `> ${fmt(lower*e, pickBestUnit(lower*e))}`;
+    const to = Number.isFinite(upper) ? `≤ ${fmt(upper*e, pickBestUnit(upper*e))}` : 'di atasnya';
+    lower=upper;
+    return `<tr><td>${from} s.d. ${to}</td><td>± ${fmt(factor*mult*e, pickBestUnit(factor*mult*e))}</td><td>± ${fmtNum(factor*mult)}e</td></tr>`;
+  }).join('');
+}
+function uniqueMassPoints(points, Max){
+  const uniq=[];
+  points.filter(p=>Number.isFinite(p) && p>=0 && p<=Max).sort((a,b)=>a-b).forEach(p=>{
+    if(!uniq.some(x=>Math.abs(x-p)<=Math.max(1e-9,Math.abs(p)*1e-10))) uniq.push(p);
+  });
+  return uniq;
+}
+function suggestedLoads(Max,e,sc,minCap,minCount=5){
+  const points=[];
+  const start = (Number.isFinite(minCap) && minCap>0 && minCap<=Max) ? minCap : Math.min(Max, e);
+  if(start>0) points.push(start);
+  if(sc.chosen){
+    for(const [upper] of classData[sc.chosen].mpe){
+      if(Number.isFinite(upper)){
+        const p=upper*e;
+        if(p>0 && p<Max) points.push(p);
+      }
+    }
+  }
+  if(Max>start){
+    for(let i=1;i<minCount-1;i++) points.push(start + (Max-start)*i/(minCount-1));
+    [0.25,0.5,0.75].forEach(f=>points.push(Max*f));
+  }
+  points.push(Max);
+  const uniq = uniqueMassPoints(points, Max);
+  return uniq;
+}
+function fillSuggestedLoads(){
+  const Max=parseMass('maxVal','maxUnit');
+  const e=parseMass('eVal','eUnit');
+  const d=parseMass('dVal','dUnit');
+  const unit=document.getElementById('testUnit')?.value || 'kg';
+  const result=document.getElementById('result');
+  if(!Max || !e){ result.innerHTML='<span class="status bad">Isi Max dan e terlebih dahulu untuk membuat titik uji acuan.</span>'; return; }
+  const n=Max/e;
+  const sc=selectedClass(e,n);
+  if(!sc.chosen || !sc.validMarked){ result.innerHTML='<span class="status warn">Kelas belum valid. Periksa Max/e atau pilih kelas yang sesuai sebelum mengisi titik uji acuan.</span>'; return; }
+  const minCap=(sc.minCapE || minFactorForClass(sc.chosen,e))*(d || e);
+  clearLoadRows();
+  suggestedLoads(Max,e,sc,minCap).forEach(p=>addLoadRow(massToUnitValue(p,unit),''));
+}
+function listFmtMass(arr, unit){
+  return arr.map(p=>fmt(p,unit || pickBestUnit(p))).join('; ');
+}
+let activePlanBkdFn = null;
+function parseMassesFromText(text){
+  const out=[];
+  const re=/(\d{1,3}(?:\.\d{3})*(?:,\d+)?|\d+(?:,\d+)?)\s*(mg|g|kg|ton)\b/gi;
+  let m;
+  while((m=re.exec(String(text)))!==null){
+    const raw=m[1].replace(/\./g,'').replace(',', '.');
+    const unit=m[2].toLowerCase();
+    const val=Number(raw);
+    if(Number.isFinite(val) && unitToG[unit]!==undefined){
+      const grams=val*unitToG[unit];
+      if(!out.some(x=>Math.abs(x-grams)<=Math.max(1e-9,Math.abs(grams)*1e-10))) out.push(grams);
+    }
+  }
+  return out;
+}
+function bkdMuatanFromText(text, explicit='-'){
+  if(explicit && explicit !== '-') return explicit;
+  if(typeof activePlanBkdFn !== 'function') return '-';
+  const loads=parseMassesFromText(text);
+  if(!loads.length) return '-';
+  return loads.map(load=>{
+    const b=activePlanBkdFn(load);
+    return Number.isFinite(b) ? `${fmt(load,pickBestUnit(load))}: ± ${fmt(b,pickBestUnit(b))}` : `${fmt(load,pickBestUnit(load))}: -`;
+  }).join('; ');
+}
+function planRow(jenis, muatan, imbuh, batas, catatan, bkdMuatan='-'){
+  return {Jenis_pengujian:jenis, Muatan_uji:muatan, BKD_muatan:bkdMuatan, Imbuh_tambahan:imbuh};
+}
+function renderPlanTable(rows){
+  const cleanRows = (rows || []).filter(Boolean);
+  lastPlanRows = cleanRows.map(r=>Object.assign({}, r, {BKD_muatan:bkdMuatanFromText(r.Muatan_uji, r.BKD_muatan)}));
+  if(!lastPlanRows.length) return '';
+  return `<h3>Rencana jenis pengujian dan muatan uji</h3>
+    <div class="plan-note">Daftar ini membantu menyiapkan cerapan dan standar uji. Nilai muatan dapat disesuaikan dengan konstruksi alat, persetujuan tipe, standar uji yang tersedia, dan kondisi tempat pakai. Muatan uji kebenaran pada BKD ±2e dan muatan repeatability yang menghasilkan pecahan dibulatkan ke atas pada satuan yang digunakan.</div>
+    <div class="table-wrap"><table><thead><tr><th>Jenis pengujian</th><th>Muatan uji yang disarankan</th><th>BKD muatan</th><th>Imbuh/tambahan</th></tr></thead><tbody>${lastPlanRows.map(r=>`<tr><td>${escapeHtml(r.Jenis_pengujian)}</td><td>${escapeHtml(r.Muatan_uji)}</td><td>${escapeHtml(r.BKD_muatan)}</td><td>${escapeHtml(r.Imbuh_tambahan)}</td></tr>`).join('')}</tbody></table></div>`;
+}
+function loadAtEffectiveBkd(cls,e,Max,targetEffectiveFactor,mult){
+  if(!cls || !classData[cls] || !Number.isFinite(e) || e<=0 || !Number.isFinite(Max) || Max<=0) return {load:Max, exact:false, factor:null};
+  const targetTable = targetEffectiveFactor / mult;
+  let lower=0, best=null, bestDiff=Infinity;
+  for(const [upper,factor] of classData[cls].mpe){
+    const diff=Math.abs(factor-targetTable);
+    if(diff<bestDiff){
+      bestDiff=diff;
+      best={lower,upper,factor};
+    }
+    lower=upper;
+  }
+  const lowerLoad=(best.lower||0)*e;
+  const upperLoad=Number.isFinite(best.upper) ? Math.min(best.upper*e, Max) : Max;
+  let load;
+  if(upperLoad>lowerLoad){
+    load=lowerLoad + (upperLoad-lowerLoad)/2;
+  }else{
+    load=Math.min(Max, Math.max(e, upperLoad || Max));
+  }
+  load=Math.max(0, Math.min(load, Max));
+  return {load, exact:Math.abs(best.factor-targetTable)<1e-12, factor:best.factor};
+}
+function bkdValueAt(cls,e,m,mult){
+  if(!cls || !Number.isFinite(e) || e<=0 || !Number.isFinite(m)) return NaN;
+  const f=mpeFactor(cls, m/e);
+  return f===null ? NaN : f*e*mult;
+}
+function bkdImbuhText(cls,e,m,mult){
+  const b=bkdValueAt(cls,e,m,mult);
+  return Number.isFinite(b) ? `Imbuh sebesar BKD pada muatan uji, yaitu ± ${fmt(b,pickBestUnit(b))}` : 'Imbuh sebesar BKD pada muatan uji';
+}
+function massText(g, fallback){
+  return Number.isFinite(g) && g>0 ? fmt(g,pickBestUnit(g)) : fallback;
+}
+function readMassField(idVal,idUnit){
+  const el=document.getElementById(idVal);
+  const unitEl=document.getElementById(idUnit);
+  if(!el || !unitEl) return {hasValue:false, valid:false, grams:0};
+  const raw=el.value.trim();
+  if(raw==='') return {hasValue:false, valid:true, grams:0, unit:unitEl.value};
+  const val=Number(raw);
+  if(!Number.isFinite(val) || val<=0) return {hasValue:true, valid:false, grams:0, unit:unitEl.value};
+  return {hasValue:true, valid:true, grams:val*unitToG[unitEl.value], unit:unitEl.value};
+}
+function updateMultiIntervalPanel(){
+  const sel=document.getElementById('instrumentFamily');
+  const panel=document.getElementById('multiIntervalPanel');
+  if(!sel || !panel) return;
+  panel.classList.toggle('hidden', sel.value!=='electronic_multi_interval');
+}
+function getMultiIntervalData(){
+  const family=document.getElementById('instrumentFamily')?.value;
+  if(family!=='electronic_multi_interval') return {enabled:false, complete:false, valid:true};
+  const max1=readMassField('miMax1Val','miMax1Unit');
+  const e1=readMassField('miE1Val','miE1Unit');
+  const max2=readMassField('miMax2Val','miMax2Unit');
+  const e2=readMassField('miE2Val','miE2Unit');
+  const fields=[max1,e1,max2,e2];
+  const any=fields.some(x=>x.hasValue);
+  const all=fields.every(x=>x.hasValue && x.valid);
+  if(!any) return {enabled:true, complete:false, valid:true, message:'Isi Max₁, e₁, Max₂, dan e₂ untuk menampilkan rentang ukur multi interval.'};
+  if(!all) return {enabled:true, complete:false, valid:false, message:'Parameter multi interval harus diisi lengkap dengan nilai positif: Max₁, e₁, Max₂, dan e₂.'};
+  if(max2.grams<=max1.grams) return {enabled:true, complete:false, valid:false, message:'Max₂ harus lebih besar dari Max₁ pada timbangan multi interval.'};
+  return {
+    enabled:true,
+    complete:true,
+    valid:true,
+    intervals:[
+      {label:'Interval I', from:0, to:max1.grams, e:e1.grams},
+      {label:'Interval II', from:max1.grams, to:max2.grams, e:e2.grams}
+    ]
+  };
+}
+function bkdValueAtMultiInterval(cls,intervals,m,mult){
+  if(!cls || !Array.isArray(intervals) || !intervals.length || !Number.isFinite(m)) return NaN;
+  const eps=Math.max(1e-9, Math.abs(m)*1e-10);
+  let active=intervals.find(r=>m<=r.to+eps);
+  if(!active) active=intervals[intervals.length-1];
+  const eUse=active.e;
+  if(!Number.isFinite(eUse) || eUse<=0) return NaN;
+  const f=mpeFactor(cls, m/eUse);
+  return f===null ? NaN : f*eUse*mult;
+}
+function renderMultiIntervalTable(data){
+  if(!data || !data.enabled) return '';
+  if(!data.complete){
+    const cls=data.valid ? 'plan-note' : 'note';
+    return `<h3>Rentang ukur multi interval</h3><div class="${cls}">${escapeHtml(data.message || 'Parameter multi interval belum lengkap.')}</div>`;
+  }
+  const rows=data.intervals.map((r,idx)=>{
+    const rentang=idx===0 ? `0 s.d. ${fmt(r.to,pickBestUnit(r.to))}` : `> ${fmt(r.from,pickBestUnit(r.from))} s.d. ${fmt(r.to,pickBestUnit(r.to))}`;
+    const n=r.to/r.e;
+    return `<tr><td>${escapeHtml(r.label)}</td><td>${escapeHtml(rentang)}</td><td>${fmt(r.to,pickBestUnit(r.to))}</td><td>${fmt(r.e,pickBestUnit(r.e))}</td><td>${fmtNum(n)}</td></tr>`;
+  }).join('');
+  return `<h3>Rentang ukur multi interval</h3><div class="table-wrap"><table><thead><tr><th>Interval</th><th>Rentang ukur</th><th>Kapasitas maksimum</th><th>e</th><th>n = Max/e</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+
+function maxMinusInterval(Max,interval){
+  const v=Max-(Number.isFinite(interval)?interval:0);
+  return v>0 ? v : Max;
+}
+function makeStandardRow(){
+  return null;
+}
+function buildGeneralTestPlan(Max,e,d,minCap,sc,mult,inspectionText){
+  if(!sc.chosen || !sc.validMarked) return [];
+  const family=document.getElementById('instrumentFamily').value;
+  const maxUnit=document.getElementById('maxUnit')?.value || pickBestUnit(Max);
+  const multiIntervalData=getMultiIntervalData();
+  activePlanBkdFn = (family==='electronic_multi_interval' && multiIntervalData.complete)
+    ? (load)=>bkdValueAtMultiInterval(sc.chosen,multiIntervalData.intervals,load,mult)
+    : (load)=>bkdValueAt(sc.chosen,e,load,mult);
+  const hasTare=document.getElementById('hasTare').value==='yes';
+  const aux=parseOptionalMass('auxVal','auxUnit');
+  const smallBeam=parseOptionalMass('smallBeamVal','smallBeamUnit');
+  const auxMass=aux===null ? 0 : aux;
+  const smallMass=smallBeam===null ? 0 : smallBeam;
+  const auxUnit=document.getElementById('auxUnit')?.value || pickBestUnit(auxMass);
+  const interval=d || e;
+  const minLoad=(Number.isFinite(minCap) && minCap>0) ? minCap : e;
+  const tera = mult===1;
+  const rows=[];
+
+  if(family==='dacin'){
+    const truth=maxMinusInterval(Max, interval);
+    rows.push(planRow('Uji penyetelan nol', 'Tanpa muatan / posisi nol', '-', 'Penunjukan kembali ke nol sebelum pembebanan', 'Pastikan lengan/penunjuk berada pada posisi setimbang.'));
+    rows.push(planRow('Uji kebenaran', `${fmt(Max,pickBestUnit(Max))} atau ${fmt(truth,pickBestUnit(truth))}`, '-', `Kesalahan penunjukan tidak melebihi BKD ${inspectionText}`, 'Gunakan Max; bila konstruksi mengharuskan pengurangan interval, gunakan Max − d.'));
+    rows.push(planRow('Uji kepekaan', `Sama seperti uji kebenaran: ${fmt(Max,pickBestUnit(Max))} atau ${fmt(truth,pickBestUnit(truth))}`, bkdImbuhText(sc.chosen,e,truth,mult), 'Penunjuk harus memberikan reaksi/gerak yang jelas', 'Tambahkan imbuh sebesar BKD pada kondisi setimbang.'));
+    rows.push(planRow('Uji repeatability', `${fmtRepeatabilityLoad(truth,maxUnit)}`, 'Ulangi minimal 3 kali', 'Selisih hasil penunjukan terbesar tidak melebihi BKD', 'Muatan repeatability menggunakan Max − d.'));
+    rows.push(makeStandardRow());
+    return rows;
+  }
+
+  if(family==='sentisimal'){
+    const gandarUtamaText=massText(auxMass,'Sesuai skala maksimum gandar utama');
+    rows.push(planRow('Uji penyetelan nol', 'Tanpa muatan / posisi nol', '-', 'Penunjukan kembali ke nol sebelum pembebanan', 'Pastikan alat setimbang sebelum uji berikutnya.'));
+    rows.push(planRow('Uji kebenaran', fmt(Max,pickBestUnit(Max)), '-', `Kesalahan penunjukan tidak melebihi BKD ${inspectionText}`, 'Muatan kebenaran menggunakan Max.'));
+    rows.push(planRow('Uji kepekaan', fmt(Max,pickBestUnit(Max)), bkdImbuhText(sc.chosen,e,Max,mult), 'Penunjuk harus memberikan reaksi/gerak yang jelas', 'Tambahkan imbuh sebesar BKD pada muatan uji kebenaran.'));
+    rows.push(planRow('Uji repeatability', fmtRepeatabilityLoad(Max,maxUnit), 'Ulangi minimal 3 kali', 'Selisih hasil penunjukan terbesar tidak melebihi BKD', 'Muatan repeatability menggunakan Max.'));
+    rows.push(planRow('Uji eksentrisitas', `4 titik uji; muatan ${gandarUtamaText}`, '-', 'Kesalahan tiap titik tidak melebihi BKD pada muatan uji', 'Muatan mengikuti skala maksimum gandar utama. Isi kapasitas gandar/skala acuan bila ingin nilai numerik tampil.'));
+    rows.push(planRow('Uji kemiringan', 'Tanpa muatan dan dengan muatan uji sesuai prosedur', '-', 'Penunjukan tetap dalam batas yang dipersyaratkan', 'Dilakukan untuk timbangan sentisimal.'));
+    if(tera){
+      rows.push(planRow('Uji kebenaran gandar', gandarUtamaText, '-', 'Kesalahan gandar tidak melebihi BKD', 'Hanya untuk tera.'));
+    }
+    rows.push(makeStandardRow());
+    return rows;
+  }
+
+  if(family==='bobot_ingsut'){
+    const gandarBesarText=massText(auxMass,'Sesuai kapasitas maksimum gandar besar');
+    const gandarKecilText=massText(smallMass,'Sesuai kapasitas maksimum gandar kecil');
+    rows.push(planRow('Uji penyetelan nol', 'Tanpa muatan / posisi nol', '-', 'Penunjukan kembali ke nol sebelum pembebanan', 'Pastikan bobot ingsut berada pada posisi nol yang benar.'));
+    rows.push(planRow('Uji kebenaran', gandarBesarText, '-', `Kesalahan penunjukan tidak melebihi BKD ${inspectionText}`, 'Muatan mengikuti kapasitas maksimum gandar besar.'));
+    rows.push(planRow('Uji kepekaan', gandarBesarText, auxMass>0 ? bkdImbuhText(sc.chosen,e,auxMass,mult) : 'Imbuh sebesar BKD pada muatan uji', 'Penunjuk harus memberikan reaksi/gerak yang jelas', 'Tambahkan imbuh sebesar BKD pada muatan uji kebenaran.'));
+    rows.push(planRow('Uji repeatability', repeatabilityMassText(auxMass,auxUnit,'Sesuai kapasitas maksimum gandar besar'), 'Ulangi minimal 3 kali', 'Selisih hasil penunjukan terbesar tidak melebihi BKD', 'Muatan repeatability menggunakan kapasitas maksimum gandar besar.'));
+    rows.push(planRow('Uji eksentrisitas', `4 titik uji; muatan ${fmt(0.3*Max,pickBestUnit(0.3*Max))}`, '-', 'Kesalahan tiap titik tidak melebihi BKD pada muatan uji', 'Muatan eksentrisitas sebesar 30% Max.'));
+    rows.push(planRow('Uji kemiringan', 'Tanpa muatan dan dengan muatan uji sesuai prosedur', '-', 'Penunjukan tetap dalam batas yang dipersyaratkan', 'Dilakukan untuk timbangan bobot ingsut.'));
+    if(tera){
+      rows.push(planRow('Uji kebenaran gandar kecil', gandarKecilText, '-', 'Kesalahan gandar kecil tidak melebihi BKD', 'Hanya untuk tera. Isi kapasitas gandar kecil bila ingin nilai numerik tampil.'));
+    }
+    rows.push(makeStandardRow());
+    return rows;
+  }
+
+  if(family==='pegas_cepat'){
+    const maxMinusE=maxMinusInterval(Max,e);
+    const discr=maxMinusInterval(Max,5*e);
+    rows.push(planRow('Uji penyetelan nol', 'Tanpa muatan / posisi nol', '-', 'Penunjukan kembali ke nol sebelum pembebanan', 'Pastikan jarum/penunjuk berada pada nol.'));
+    rows.push(planRow('Uji kebenaran', `${fmt(minLoad,pickBestUnit(minLoad))}; ${fmt(0.5*Max,pickBestUnit(0.5*Max))}; ${fmt(maxMinusE,pickBestUnit(maxMinusE))}`, '-', `Kesalahan penunjukan tidak melebihi BKD ${inspectionText}`, 'Tiga titik uji: Min, 50% Max, dan Max − e.'));
+    rows.push(planRow('Uji diskriminasi', fmt(discr,pickBestUnit(discr)), bkdImbuhText(sc.chosen,e,discr,mult), 'Penunjukan harus berubah/merespons tambahan kecil', 'Muatan diskriminasi: Max − 5e, lalu tambahkan imbuh sebesar BKD.'));
+    rows.push(planRow('Uji repeatability', fmtRepeatabilityLoad(0.8*Max,maxUnit), 'Ulangi minimal 3 kali', 'Selisih hasil penunjukan terbesar tidak melebihi BKD', 'Muatan repeatability sebesar 0,8 Max.'));
+    rows.push(planRow('Uji eksentrisitas', `4 titik uji; muatan ${fmt(Max/3,pickBestUnit(Max/3))}`, '-', 'Kesalahan tiap titik tidak melebihi BKD pada muatan uji', 'Muatan eksentrisitas sebesar 1/3 Max.'));
+    rows.push(makeStandardRow());
+    return rows;
+  }
+
+  if(family==='cepat_meja'){
+    const maxMinusE=maxMinusInterval(Max,e);
+    rows.push(planRow('Uji penyetelan nol', 'Tanpa muatan / posisi nol', '-', 'Penunjukan kembali ke nol sebelum pembebanan', 'Pastikan penunjukan awal berada pada nol.'));
+    rows.push(planRow('Uji kebenaran', `${fmt(minLoad,pickBestUnit(minLoad))}; ${fmt(0.5*Max,pickBestUnit(0.5*Max))}; ${fmt(maxMinusE,pickBestUnit(maxMinusE))}`, '-', `Kesalahan penunjukan tidak melebihi BKD ${inspectionText}`, 'Tiga titik uji: Min, 1/2 Max, dan Max − e.'));
+    rows.push(planRow('Uji diskriminasi', `${fmt(minLoad,pickBestUnit(minLoad))} dan ${fmt(Max,pickBestUnit(Max))}`, `Imbuh sebesar BKD pada masing-masing muatan uji`, 'Penunjukan harus berubah/merespons tambahan kecil', 'Lakukan pada muatan Min dan Max, kemudian tambahkan imbuh sebesar BKD.'));
+    rows.push(planRow('Uji repeatability', fmtRepeatabilityLoad(Max,maxUnit), 'Ulangi minimal 3 kali', 'Selisih hasil penunjukan terbesar tidak melebihi BKD', 'Muatan repeatability menggunakan Max.'));
+    rows.push(planRow('Uji eksentrisitas', `4 titik uji; muatan ${fmt(Max/3,pickBestUnit(Max/3))}`, '-', 'Kesalahan tiap titik tidak melebihi BKD pada muatan uji', 'Muatan eksentrisitas sebesar 1/3 Max.'));
+    rows.push(makeStandardRow());
+    return rows;
+  }
+
+  if(family==='neraca'){
+    rows.push(planRow('Uji penyetelan nol', 'Tanpa muatan / posisi nol', '-', 'Neraca berada pada kondisi setimbang', 'Pastikan titik nol/setimbang sebelum uji.'));
+    rows.push(planRow('Penentuan nilai skala neraca dan uji kepekaan', 'Sesuai nilai skala neraca dan anak timbangan pembanding', 'Tambahan kecil sampai perubahan setimbang terlihat', 'Nilai skala dan kepekaan harus sesuai ketentuan alat', 'Dilakukan sebelum/bersamaan dengan pengamatan kesetimbangan.'));
+    rows.push(planRow('Uji kebenaran dan repeatability', fmtTruthAndRepeatabilityLoad(Max,maxUnit), 'Ulangi minimal 3 kali untuk repeatability', `Kesalahan dan selisih hasil tidak melebihi BKD ${inspectionText}`, 'Muatan kebenaran dan repeatability menggunakan Max.'));
+    rows.push(makeStandardRow());
+    return rows;
+  }
+
+  if(family==='meja'){
+    rows.push(planRow('Uji penyetelan nol', 'Tanpa muatan / posisi nol', '-', 'Penunjukan kembali ke nol sebelum pembebanan', 'Pastikan penunjukan awal berada pada nol.'));
+    rows.push(planRow('Uji kebenaran', fmt(Max,pickBestUnit(Max)), '-', `Kesalahan penunjukan tidak melebihi BKD ${inspectionText}`, 'Muatan uji kebenaran menggunakan Max.'));
+    rows.push(planRow('Uji kepekaan', fmt(Max,pickBestUnit(Max)), bkdImbuhText(sc.chosen,e,Max,mult), 'Penunjuk harus memberikan reaksi/gerak yang jelas', 'Muatan sama dengan uji kebenaran, kemudian tambahkan imbuh sebesar BKD.'));
+    rows.push(planRow('Uji eksentrisitas', `4 titik uji; muatan ${fmt(Max/3,pickBestUnit(Max/3))}`, '-', 'Kesalahan tiap titik tidak melebihi BKD pada muatan uji', 'Muatan eksentrisitas sebesar 1/3 Max.'));
+    rows.push(planRow('Uji repeatability', fmtRepeatabilityLoad(Max,maxUnit), 'Ulangi minimal 3 kali', 'Selisih hasil penunjukan terbesar tidak melebihi BKD', 'Muatan repeatability menggunakan Max.'));
+    rows.push(makeStandardRow());
+    return rows;
+  }
+
+  const bkd2=loadAtEffectiveBkd(sc.chosen,e,Max,2,mult);
+  const truthLoads=uniqueMassPoints([minLoad,bkd2.load,Max],Max);
+  const repeatTarget=tera ? 1 : 2;
+  const rep=loadAtEffectiveBkd(sc.chosen,e,Max,repeatTarget,mult);
+  const electronicVariant = family==='electronic_multi_interval' ? 'multi interval' : family==='electronic_multi_range' ? 'multi rentang' : 'biasa';
+  const activeScope = family==='electronic_multi_interval' ? 'interval aktif' : family==='electronic_multi_range' ? 'rentang aktif' : 'timbangan';
+  const bkd2Note=bkd2.exact ? `Muatan tengah berada pada rentang BKD efektif ±2e untuk ${activeScope}.` : `Muatan tengah memakai rentang BKD terdekat karena BKD efektif ±2e tidak tersedia pada kombinasi kelas/kegiatan ini.`;
+  const variantNote = electronicVariant==='biasa' ? '' : ` Perhitungan ini berlaku untuk ${activeScope}; ulangi dengan Max dan e ${activeScope} lain bila alat memiliki lebih dari satu ${family==='electronic_multi_interval'?'interval':'rentang'}.`;
+  rows.push(planRow(`Uji kebenaran elektronik ${electronicVariant}`, fmtTruthLoadsWithRoundedBkd2(minLoad,bkd2.load,Max,maxUnit), '-', `Kesalahan penunjukan tidak melebihi BKD ${inspectionText}`, `Tiga titik uji: Min, muatan pada BKD ±2e, dan Max. Muatan pada BKD ±2e dibulatkan ke atas bila menghasilkan pecahan pada satuan ${unitNames[maxUnit] || maxUnit}. ${bkd2Note}${variantNote}`));
+  rows.push(planRow(`Uji eksentrisitas elektronik ${electronicVariant}`, `4 titik uji; muatan ${fmt(Max/3,pickBestUnit(Max/3))}`, '-', 'Kesalahan tiap titik tidak melebihi BKD pada muatan uji', `Muatan eksentrisitas sebesar 1/3 Max untuk ${activeScope}.`));
+  rows.push(planRow(`Uji penyetelan nol elektronik ${electronicVariant}`, fmt(10*e,pickBestUnit(10*e)), `Imbuh ${fmt(0.25*e,pickBestUnit(0.25*e))}`, 'Penyimpangan setelah penyetelan nol maksimum ±0,25e', `Muatan penyetelan nol sebesar 10e pada ${activeScope}, kemudian tambahkan imbuh 0,25e.`));
+  if(hasTare){
+    rows.push(planRow(`Uji penyetel tara elektronik ${electronicVariant}`, 'Sesuai nilai tara yang digunakan pada alat', `Imbuh ${fmt(0.25*e,pickBestUnit(0.25*e))}`, 'Penyetel tara harus memenuhi batas yang dipersyaratkan', `Hanya untuk timbangan yang memiliki perangkat/fungsi tara pada ${activeScope}.`));
+  }
+  rows.push(planRow(`Uji repeatability elektronik ${electronicVariant}`, `${fmtRepeatabilityLoad(rep.load,maxUnit)}`, 'Ulangi minimal 3 kali', `Selisih hasil penunjukan terbesar tidak melebihi BKD pada nilai ±${repeatTarget}e`, `Muatan dipilih pada nilai BKD ${repeatTarget}e untuk ${tera?'tera':'tera ulang'} pada ${activeScope}.`));
+  rows.push(makeStandardRow());
+  return rows;
+}
+function buildSpecialTestPlan(type,Max,e,mult,inspectionText){
+  activePlanBkdFn = (load)=> specialRules[type] ? specialRules[type].calcBKD(Max,load)*mult : NaN;
+  const specialMaxUnit=document.getElementById('sMaxUnit')?.value || pickBestUnit(Max);
+  const rows=[];
+  const interval=Number.isFinite(e) && e>0 ? e : 0;
+  if(type==='dacin'){
+    const truth=maxMinusInterval(Max, interval);
+    rows.push(planRow('Uji penyetelan nol', 'Tanpa muatan / posisi nol', '-', 'Penunjukan kembali ke nol sebelum pembebanan', 'Pastikan lengan/penunjuk berada pada posisi setimbang.'));
+    rows.push(planRow('Uji kebenaran', `${fmt(Max,pickBestUnit(Max))} atau ${fmt(truth,pickBestUnit(truth))}`, '-', `Kesalahan penunjukan tidak melebihi BKD ${inspectionText}`, 'Gunakan Max; bila konstruksi mengharuskan pengurangan interval, gunakan Max − d/e.'));
+    rows.push(planRow('Uji kepekaan', `Sama seperti uji kebenaran: ${fmt(Max,pickBestUnit(Max))} atau ${fmt(truth,pickBestUnit(truth))}`, 'Imbuh sebesar BKD pada muatan uji', 'Penunjuk harus memberikan reaksi/gerak yang jelas', 'Tambahkan imbuh sebesar BKD pada kondisi setimbang.'));
+    rows.push(planRow('Uji repeatability', `${fmtRepeatabilityLoad(truth,specialMaxUnit)}`, 'Ulangi minimal 3 kali', 'Selisih hasil penunjukan terbesar tidak melebihi BKD', 'Muatan repeatability menggunakan Max − d/e.'));
+    rows.push(makeStandardRow());
+    return rows;
+  }
+  if(type==='meja'){
+    rows.push(planRow('Uji penyetelan nol', 'Tanpa muatan / posisi nol', '-', 'Penunjukan kembali ke nol sebelum pembebanan', 'Pastikan penunjukan awal berada pada nol.'));
+    rows.push(planRow('Uji kebenaran', fmt(Max,pickBestUnit(Max)), '-', `Kesalahan penunjukan tidak melebihi BKD ${inspectionText}`, 'Muatan uji kebenaran menggunakan Max.'));
+    rows.push(planRow('Uji kepekaan', fmt(Max,pickBestUnit(Max)), `Imbuh sebesar BKD pada muatan uji`, 'Penunjuk harus memberikan reaksi/gerak yang jelas', 'Muatan sama dengan uji kebenaran, kemudian tambahkan imbuh sebesar BKD.'));
+    rows.push(planRow('Uji eksentrisitas', `4 titik uji; muatan ${fmt(Max/3,pickBestUnit(Max/3))}`, '-', 'Kesalahan tiap titik tidak melebihi BKD pada muatan uji', 'Muatan eksentrisitas sebesar 1/3 Max.'));
+    rows.push(planRow('Uji repeatability', fmtRepeatabilityLoad(Max,specialMaxUnit), 'Ulangi minimal 3 kali', 'Selisih hasil penunjukan terbesar tidak melebihi BKD', 'Muatan repeatability menggunakan Max.'));
+    rows.push(makeStandardRow());
+    return rows;
+  }
+
+  if(type==='obat' || type==='emas'){
+    rows.push(planRow('Uji penyetelan nol', 'Tanpa muatan / posisi nol', '-', 'Neraca berada pada kondisi setimbang', 'Pastikan titik nol/setimbang sebelum uji.'));
+    rows.push(planRow('Penentuan nilai skala neraca dan uji kepekaan', 'Sesuai nilai skala neraca dan anak timbangan pembanding', 'Tambahan kecil sampai perubahan setimbang terlihat', 'Nilai skala dan kepekaan harus sesuai ketentuan alat', 'Diterapkan untuk neraca obat/neraca emas kelas III.'));
+    rows.push(planRow('Uji kebenaran dan repeatability', fmtTruthAndRepeatabilityLoad(Max,specialMaxUnit), 'Ulangi minimal 3 kali untuk repeatability', `Kesalahan dan selisih hasil tidak melebihi BKD ${inspectionText}`, 'Muatan kebenaran dan repeatability menggunakan Max.'));
+    rows.push(makeStandardRow());
+    return rows;
+  }
+  const minLike=interval>0 ? interval : Max*0.02;
+  const maxMinusE=maxMinusInterval(Max, interval);
+  rows.push(planRow('Uji penyetelan nol', 'Tanpa muatan / posisi nol', '-', 'Penunjukan kembali ke nol sebelum pembebanan', 'Pastikan penunjukan awal berada pada nol.'));
+  rows.push(planRow('Uji kebenaran', `${fmt(minLike,pickBestUnit(minLike))}; ${fmt(0.5*Max,pickBestUnit(0.5*Max))}; ${fmt(maxMinusE,pickBestUnit(maxMinusE))}`, '-', `Kesalahan penunjukan tidak melebihi BKD ${inspectionText}`, 'Tiga titik uji: Min, 1/2 Max, dan Max − e.'));
+  rows.push(planRow('Uji diskriminasi / kepekaan', `${fmt(minLike,pickBestUnit(minLike))} dan ${fmt(Max,pickBestUnit(Max))}`, 'Imbuh sebesar BKD pada masing-masing muatan uji', 'Penunjukan harus berubah/merespons tambahan kecil', 'Tambahkan imbuh sebesar BKD.'));
+  rows.push(planRow('Uji repeatability', fmtRepeatabilityLoad(Max,specialMaxUnit), 'Ulangi minimal 3 kali', 'Selisih hasil penunjukan terbesar tidak melebihi BKD', 'Muatan repeatability menggunakan Max.'));
+  rows.push(planRow('Uji eksentrisitas', `4 titik uji; muatan ${fmt(Max/3,pickBestUnit(Max/3))}`, '-', 'Kesalahan tiap titik tidak melebihi BKD pada muatan uji', 'Muatan eksentrisitas sebesar 1/3 Max.'));
+  rows.push(makeStandardRow());
+  return rows;
+}
+
+function calculate(){
+  if(mode==='general') return calculateGeneral();
+  return calculateSpecial();
+}
+function calculateGeneral(){
+  const Max=parseMass('maxVal','maxUnit');
+  const e=parseMass('eVal','eUnit');
+  const d=parseMass('dVal','dUnit');
+  const result=document.getElementById('result');
+  if(!Max || !e){ result.innerHTML='<span class="status bad">Max dan e harus diisi dengan nilai positif.</span>'; return; }
+  if(d && !(d<=e)){ result.innerHTML='<span class="status warn">Nilai d biasanya tidak lebih besar dari e. Periksa kembali daya baca dan interval verifikasi.</span>'; return; }
+  const auxCheck=parseOptionalMass('auxVal','auxUnit');
+  const smallBeamCheck=parseOptionalMass('smallBeamVal','smallBeamUnit');
+  if(auxCheck===null || smallBeamCheck===null){ result.innerHTML='<span class="status bad">Kapasitas gandar/skala acuan harus kosong atau bernilai positif.</span>'; return; }
+  const multiIntervalData=getMultiIntervalData();
+  if(multiIntervalData.enabled && !multiIntervalData.valid){ result.innerHTML=`<span class="status bad">${escapeHtml(multiIntervalData.message)}</span>`; return; }
+  const n=Max/e;
+  const sc=selectedClass(e,n);
+  const mult=document.getElementById('inspectionType').value==='service' ? 2 : 1;
+  const inspectionText = mult===2 ? 'Tera ulang / pengawasan / pemakaian' : 'Tera / verifikasi awal';
+  let status='';
+  if(!sc.chosen){
+    status='<span class="status bad">Tidak ada kelas yang memenuhi kombinasi Max dan e.</span>';
+  }else if(!sc.validMarked){
+    status=`<span class="status warn">Kelas tertera ${sc.chosen} tidak memenuhi syarat Max/e. Periksa identitas alat atau nilai e.</span>`;
+  }else{
+    status=`<span class="status ok">Kelas terpilih: ${classData[sc.chosen].name}</span>` + (sc.valids.length>1 && document.getElementById('markedClass').value==='auto' ? ' <span class="status warn">Lebih dari satu kelas memenuhi; aplikasi memakai kelas terendah.</span>' : '');
+  }
+  const minBase = d || e;
+  const minCap = sc.minCapE ? sc.minCapE*minBase : null;
+  const validsHtml = sc.valids.length ? sc.valids.map(v=>`<li><strong>${v.cls}</strong>: ${v.reason}; Min = ${v.minCapE}${d?'d':'e'} (${fmt(v.minCapE*minBase,pickBestUnit(v.minCapE*minBase))})</li>`).join('') : '<li>Tidak ada kelas valid.</li>';
+  lastRows=[];
+  const planHtml = sc.chosen && sc.validMarked ? renderPlanTable(buildGeneralTestPlan(Max,e,d,minCap,sc,mult,inspectionText)) : '';
+  const multiIntervalHtml = renderMultiIntervalTable(multiIntervalData);
+  result.innerHTML = `
+    <div class="result-top">
+      <div class="metric"><div class="k">Max</div><div class="v">${fmt(Max,pickBestUnit(Max))}</div><div class="s">Kapasitas maksimum</div></div>
+      <div class="metric"><div class="k">e${d?' / d':''}</div><div class="v">${fmt(e,pickBestUnit(e))}${d?` / ${fmt(d,pickBestUnit(d))}`:''}</div><div class="s">Interval verifikasi${d?' dan daya baca':''}</div></div>
+      <div class="metric"><div class="k">n = Max/e</div><div class="v">${fmtNum(n)}</div><div class="s">Jumlah interval</div></div>
+      <div class="metric"><div class="k">Min</div><div class="v">${minCap?fmt(minCap,pickBestUnit(minCap)):'-'}</div><div class="s">Kapasitas minimum</div></div>
+    </div>
+    ${status}
+    <h3>Kelas yang memenuhi</h3><ul>${validsHtml}</ul>
+    ${sc.chosen ? `<h3>Batas BKD ${inspectionText}</h3><div class="table-wrap"><table><thead><tr><th>Rentang muatan</th><th>BKD</th><th>Faktor</th></tr></thead><tbody>${rangeTable(sc.chosen,e,mult)}</tbody></table></div>` : ''}
+    ${multiIntervalHtml}
+    ${planHtml}
+    <p class="small">Ketentuan kelas acuan: ${sc.chosen ? classData[sc.chosen].ranges : 'tidak tersedia'}.</p>`;
+}
+function calculateSpecial(){
+  const type=document.getElementById('specialType').value;
+  const rule=specialRules[type];
+  const Max=parseMass('sMaxVal','sMaxUnit');
+  const m=parseMass('sLoadVal','sLoadUnit',true);
+  const indRaw=document.getElementById('sIndVal').value.trim();
+  const indUnit=document.getElementById('sIndUnit').value;
+  const ind = indRaw==='' ? null : Number(indRaw)*unitToG[indUnit];
+  const mult=document.getElementById('sInspectionType').value==='service' ? 2 : 1;
+  const inspectionText = mult===2 ? 'Tera ulang / pengawasan' : 'Tera';
+  const result=document.getElementById('result');
+  if(!Max || m===null){ result.innerHTML='<span class="status bad">Max dan muatan uji harus diisi dengan nilai positif.</span>'; return; }
+  if(m>Max){ result.innerHTML='<span class="status warn">Muatan uji lebih besar dari Max. Periksa input.</span>'; return; }
+  const e=rule.calcE(Max);
+  const n=Max/e;
+  const bkdBase=rule.calcBKD(Max,m);
+  const bkd=bkdBase*mult;
+  const err=ind===null ? null : ind-m;
+  const pass=err===null ? null : Math.abs(err)<=bkd + Math.max(1e-12, bkd*1e-12);
+  lastRows=[{No:1,Mode:'Khusus',Kegiatan:inspectionText,Jenis:rule.label,Kelas:rule.cls,Max_g:Max,e_g:e,n:n,Muatan_g:m,BKD_dasar_g:bkdBase,Pengali:mult,BKD_g:bkd,Penunjukan_g:ind,Kesalahan_g:err,Status:pass===null?'Tidak dinilai':pass?'SAH':'BATAL'}];
+  const planHtml = renderPlanTable(buildSpecialTestPlan(type,Max,e,mult,inspectionText));
+  result.innerHTML = `
+    <div class="result-top">
+      <div class="metric"><div class="k">Jenis</div><div class="v">${escapeHtml(rule.label)}</div><div class="s">Mode khusus</div></div>
+      <div class="metric"><div class="k">e</div><div class="v">${fmt(e,pickBestUnit(e))}</div><div class="s">${escapeHtml(rule.eFormula)}</div></div>
+      <div class="metric"><div class="k">n = Max/e</div><div class="v">${fmtNum(n)}</div><div class="s">Jumlah interval</div></div>
+      <div class="metric"><div class="k">BKD</div><div class="v">± ${fmt(bkd,pickBestUnit(bkd))}</div><div class="s">${inspectionText}</div></div>
+    </div>
+    <span class="status ok">BKD: ± ${fmt(bkd,pickBestUnit(bkd))}</span>
+    <h3>Rincian</h3>
+    <div class="table-wrap"><table><thead><tr><th>Max</th><th>Muatan uji m</th><th>Formula BKD dasar</th><th>Pengali</th><th>BKD</th><th>Kesalahan I − m</th><th>Status</th></tr></thead><tbody>
+    <tr><td>${fmt(Max,pickBestUnit(Max))}</td><td>${fmt(m,pickBestUnit(m))}</td><td>${escapeHtml(rule.bkdFormula)}</td><td>${mult}×</td><td>± ${fmt(bkd,pickBestUnit(bkd))}</td><td>${err===null?'<span class="muted">-</span>':fmt(err,pickBestUnit(err))}</td><td>${pass===null?'<span class="muted">Tidak dinilai</span>':pass?'<span class="status ok">SAH</span>':'<span class="status bad">BATAL</span>'}</td></tr>
+    </tbody></table></div>
+    ${planHtml}
+    <div class="note"><strong>Catatan mode khusus</strong>Formula BKD khusus digunakan untuk dacin, timbangan meja, neraca obat kelas III, dan neraca emas kelas III. Untuk tera ulang/pengawasan, aplikasi menerapkan 2 × BKD dasar sesuai pilihan kegiatan.</div>`;
+}
+function resetForm(){
+  document.querySelectorAll('input').forEach(i=>i.value='');
+  clearLoadRows();
+  addLoadRow();
+  document.getElementById('result').innerHTML='Masukkan data, lalu klik <strong>Hitung</strong>.';
+  lastRows=[];
+  lastPlanRows=[];
+}
+function exportCSV(){
+  if(!lastPlanRows.length){ alert('Belum ada rencana muatan uji untuk diekspor. Klik Hitung terlebih dahulu.'); return; }
+  const headers=[...new Set(lastPlanRows.flatMap(o=>Object.keys(o)))];
+  const blocks=[];
+  blocks.push('RENCANA JENIS DAN MUATAN UJI');
+  blocks.push(headers.join(','));
+  blocks.push(...lastPlanRows.map(row=>headers.map(h=>`"${String(row[h]??'').replace(/"/g,'""')}"`).join(',')));
+  const csv=blocks.join('\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='kareba_rencana_jenis_dan_muatan_uji.csv';
+  document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(a.href);
+}
+renderSpecialHint();
+updateMultiIntervalPanel();
+</script>
+</body>
+</html>
